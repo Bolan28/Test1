@@ -1,0 +1,85 @@
+// Variables
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var ballX = canvas.width / 2;
+var ballY = canvas.height / 2;
+var ballSpeedX = 10;
+var ballSpeedY = 0;
+var paddle1Y = canvas.height / 2 - 50;
+var paddle2Y = canvas.height / 2 + 50;
+var playerScore = 0;
+var computerScore = 0;
+var winningScore = 3;
+
+// Functions
+function draw() {
+  // Clear the canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw the ball
+  ctx.fillStyle = "white";
+  ctx.fillCircle(ballX, ballY, 10);
+
+  // Draw the paddles
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, paddle1Y, 100, 10);
+  ctx.fillRect(canvas.width - 100, paddle2Y, 100, 10);
+
+  // Move the ball
+  ballX += ballSpeedX;
+  ballY += ballSpeedY;
+
+  // Check for collisions with the walls
+  if (ballX < 0 || ballX > canvas.width) {
+    ballSpeedX *= -1;
+  }
+  if (ballY < 0 || ballY > canvas.height) {
+    ballSpeedY *= -1;
+  }
+
+  // Check for collisions with the paddles
+  if (ballX < 100 && ballY > paddle1Y && ballY < paddle1Y + 10) {
+    ballSpeedX *= -1;
+  }
+  if (ballX > canvas.width - 100 && ballY > paddle2Y && ballY < paddle2Y + 10) {
+    ballSpeedX *= -1;
+  }
+
+  // Check for a winner
+  if (ballY < 0) {
+    computerScore++;
+  } else if (ballY > canvas.height) {
+    playerScore++;
+  }
+
+  // If a player has won, stop the game
+  if (playerScore >= winningScore || computerScore >= winningScore) {
+    gameOver();
+  }
+}
+
+function gameOver() {
+  // Clear the canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw the winner's score
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  ctx.fillText("Player " + (playerScore > computerScore ? "1" : "2") + " wins!", canvas.width / 2 - 50, canvas.height / 2);
+
+  // Disable the controls
+  document.getElementById("left").disabled = true;
+  document.getElementById("right").disabled = true;
+}
+
+// Event listeners
+document.addEventListener("keydown", function(event) {
+  if (event.keyCode == 37) {
+    paddle1Y -= 10;
+  } else if (event.keyCode == 39) {
+    paddle1Y += 10;
+  }
+});
+
+// Start the game
+requestAnimationFrame(draw);
